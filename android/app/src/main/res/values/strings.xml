@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PlaceFinderApp</string>
+            <string name="google_maps_api_key">Api_KEY</string>
+
+</resources>
