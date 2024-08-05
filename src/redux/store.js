@@ -1,12 +1,23 @@
-import {createStore, applyMiddleware} from 'redux';
-import {createEpicMiddleware} from 'redux-observable';
+import {applyMiddleware, createStore} from 'redux';
+import {persistStore, persistReducer} from 'redux-persist';
 import rootReducer from './reducers';
-import rootEpic from './epics'; // Ensure you have a root epic combining all epics
+import {createEpicMiddleware} from 'redux-observable';
+import rootEpic from './epics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const epicMiddleware = createEpicMiddleware();
 
-const store = createStore(rootReducer, applyMiddleware(epicMiddleware));
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = createStore(persistedReducer, applyMiddleware(epicMiddleware));
+
+const persistor = persistStore(store);
 
 epicMiddleware.run(rootEpic);
 
-export default store;
+export {store, persistor};

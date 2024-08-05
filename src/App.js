@@ -1,28 +1,52 @@
-import * as React from 'react';
-import {SafeAreaView, StyleSheet, View, Text} from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {Provider} from 'react-redux';
-import store from './redux/store';
+import {PersistGate} from 'redux-persist/integration/react';
+import {store, persistor} from './redux/store';
 import SearchBox from './components/SearchBox';
 import MapComponent from './components/MapView';
 import SearchHistory from './components/SearchHistory';
+import LoadMoreList from './components/LoadMoreList';
 
 const App = () => {
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [loadMore, setLoadMore] = useState(false);
+  const handleMoreHistory = () => {
+    setLoadMore(true);
+  };
   return (
     <Provider store={store}>
-      <SafeAreaView style={styles.container}>
-        <Text style={{ fontSize: 20, textAlign: 'center', margin: 20 }}>
-          Place Finder App
-        </Text>
-        <View style={styles.searchBoxContainer}>
-          <SearchBox />
-        </View>
-        <View style={styles.mapContainer}>
-          <MapComponent />
-        </View>
-        <View style={styles.historyContainer}>
-          <SearchHistory />
-        </View>
-      </SafeAreaView>
+      <PersistGate loading={null} persistor={persistor}>
+        <SafeAreaView style={styles.container}>
+          {loadMore ? (
+            <View style={{flex: 1}}>
+              <LoadMoreList setSelectedPlace={setSelectedPlace} setLoadMore={setLoadMore} />
+            </View>
+          ) : (
+            <>
+              <View
+                style={[
+                  styles.searchBoxContainer,
+                  {flex: selectedPlace ? 1.2 : 0.7},
+                ]}>
+                <SearchBox
+                  selectedPlace={selectedPlace}
+                  setSelectedPlace={setSelectedPlace}
+                />
+              </View>
+              <View style={styles.mapContainer}>
+                <MapComponent />
+              </View>
+              <View style={styles.historyContainer}>
+                <SearchHistory
+                  setSelectedPlace={setSelectedPlace}
+                  handleMoreHistory={handleMoreHistory}
+                />
+              </View>
+            </>
+          )}
+        </SafeAreaView>
+      </PersistGate>
     </Provider>
   );
 };
@@ -31,17 +55,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: '4%',
   },
-  searchBoxContainer: {
-    padding: 10,
-  },
+  searchBoxContainer: {},
   mapContainer: {
     flex: 2,
-    marginVertical: 10,
   },
   historyContainer: {
-    flex: 1,
-    padding: 10,
+    flex: 3,
   },
 });
 

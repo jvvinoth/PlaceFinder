@@ -1,5 +1,12 @@
-import React from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  BackHandler,
+} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {clearHistory} from '../redux/actions/searchActions'; // Ensure this path is correct
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -9,7 +16,7 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen';
 
-const SearchHistory = ({handleMoreHistory}) => {
+const LoadMoreList = ({setLoadMore}) => {
   const searchHistory = useSelector(state => state.search.history);
   const dispatch = useDispatch();
 
@@ -17,9 +24,10 @@ const SearchHistory = ({handleMoreHistory}) => {
   const reversedHistory = [...searchHistory].reverse();
 
   // Limit to the latest 4 items
-  const latestHistory = reversedHistory.slice(1, 5);
+  const latestHistory = reversedHistory;
   const truncated = (text, value) =>
     text?.length > value ? `${text.substring(0, value)}...` : text;
+
   // Render a single item in the list
   const renderItem = ({item}) => (
     <View style={styles.card}>
@@ -30,14 +38,17 @@ const SearchHistory = ({handleMoreHistory}) => {
       <View
         style={{
           flexDirection: 'row',
-          // flex: 1,
           justifyContent: 'space-evenly',
         }}>
         <View style={styles.icon}>
           <FontAwesome name="phone" color={'rgba(3, 138, 255,1)'} size={15} />
         </View>
         <View style={styles.icon}>
-          <Feather name="navigation-variant" color={'rgba(3, 138, 255,1)'} size={15} />
+          <Feather
+            name="navigation-variant"
+            color={'rgba(3, 138, 255,1)'}
+            size={15}
+          />
         </View>
       </View>
     </View>
@@ -46,10 +57,31 @@ const SearchHistory = ({handleMoreHistory}) => {
   // Handle clear history button press
   const handleClearHistory = () => {
     dispatch(clearHistory());
+    setLoadMore(false);
   };
+
+  // Handle the back button press
+  useEffect(() => {
+    const backAction = () => {
+      setLoadMore(false);
+      return true; // Prevent default back action
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, [setLoadMore]);
 
   return (
     <View style={styles.container}>
+      <Text style={{fontSize: 18, color: 'black', fontWeight: 'bold'}}>
+        Search History
+      </Text>
       {latestHistory.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No search history available.</Text>
@@ -64,8 +96,8 @@ const SearchHistory = ({handleMoreHistory}) => {
         />
       )}
       {latestHistory.length !== 0 && (
-        <TouchableOpacity style={styles.button} onPress={handleMoreHistory}>
-          <Text style={styles.buttonText}>Search History</Text>
+        <TouchableOpacity style={styles.button} onPress={handleClearHistory}>
+          <Text style={styles.buttonText}>Clear History</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -76,9 +108,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  list: {
-    // padding: 10,
-  },
+  list: {},
   card: {
     marginVertical: '2%',
     backgroundColor: '#fff',
@@ -114,7 +144,7 @@ const styles = StyleSheet.create({
   button: {
     margin: 10,
     padding: 10,
-    backgroundColor: 'rgba(3, 138, 255,1)',
+    backgroundColor: '#ff5c5c',
     borderRadius: 5,
     alignItems: 'center',
   },
@@ -125,7 +155,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     borderWidth: 1,
-    borderRadius: 100 / 2,
+    borderRadius: 50, // Simplified borderRadius to half of width/height
     alignItems: 'center',
     justifyContent: 'center',
     width: widthPercentageToDP('10%'),
@@ -136,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchHistory;
+export default LoadMoreList;

@@ -1,9 +1,15 @@
-// epics/index.js
 import {combineEpics} from 'redux-observable';
-import searchPlacesEpic from './epics/searchEpics';
+import {
+  searchPlacesEpic,
+  loadHistoryEpic,
+  clearHistoryEpic,
+} from './epics/searchEpics';
+
 const rootEpic = combineEpics(
   searchPlacesEpic,
-  // Add other epics here
+  loadHistoryEpic,
+  clearHistoryEpic,
+  // Add other epics here if you have any
 );
 
 export default rootEpic;

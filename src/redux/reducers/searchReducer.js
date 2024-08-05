@@ -1,4 +1,11 @@
-import {SEARCH_PLACES_SUCCESS, SEARCH_PLACES_FAILURE} from '../actions/types';
+// reducers/searchReducer.js
+import {
+  SEARCH_PLACES_SUCCESS,
+  SEARCH_PLACES_FAILURE,
+  CLEAR_HISTORY,
+  LOAD_HISTORY_SUCCESS,
+  LOAD_HISTORY_FAILURE,
+} from '../actions/searchActions';
 
 const initialState = {
   history: [],
@@ -11,10 +18,27 @@ const searchReducer = (state = initialState, action) => {
     case SEARCH_PLACES_SUCCESS:
       return {
         ...state,
-        history: [...state.history, ...action.payload],
-        selectedPlace: action.payload[0],
+        history: Array.isArray(action.payload)
+          ? [...state.history, ...action.payload]
+          : [...state.history],
+        selectedPlace: Array.isArray(action.payload) ? action.payload[0] : null,
       };
     case SEARCH_PLACES_FAILURE:
+      return {
+        ...state,
+        error: action.payload,
+      };
+    case CLEAR_HISTORY:
+      return {
+        ...state,
+        history: [],
+      };
+    case LOAD_HISTORY_SUCCESS:
+      return {
+        ...state,
+        history: action.payload,
+      };
+    case LOAD_HISTORY_FAILURE:
       return {
         ...state,
         error: action.payload,
