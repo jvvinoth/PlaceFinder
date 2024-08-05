@@ -13,7 +13,7 @@ import {
   loadHistoryFailure,
 } from '../actions/searchActions';
 
-const API_KEY = 'XXXXXX'; // Replace with your secure method of managing API keys
+const API_KEY = 'XXXXXXX'; // Replace with your secure method of managing API keys
 
 const searchPlacesEpic = action$ =>
   action$.pipe(

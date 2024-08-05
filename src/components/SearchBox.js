@@ -35,7 +35,7 @@ const SearchBox = ({searchPlaces, selectedPlace, setSelectedPlace}) => {
           placeholder="Search places"
           onPress={handlePress}
           query={{
-            key: 'XXXX', // Replace with your actual API key
+            key: 'XXXXXXX', // Replace with your actual API key
             language: 'en',
           }}
           fetchDetails={true}
